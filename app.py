@@ -38,17 +38,15 @@ def webhook():
 def processRequest(req):
 	print("Request:")
 	print(json.dumps(req, indent=4))
-	if req.get("result").get("action") == "showRestoForLocation":
-	baseurl = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?"
-	req_query = makeYqlQuery(req)
-	if yql_query is None:
+	if req.get("result").get("action") == "yahooWeatherForecast":
+		baseurl = "https://query.yahooapis.com/v1/public/yql?"
+		yql_query = makeYqlQuery(req)
+		if yql_query is None:
 			return {}
-	req_query_final = baseurl + req_query
-	print(req_query_final)
-	result = urlopen(req_query_final).read()
-	data = json.loads(result)
-	res = makeWebhookResult(data)
-	return res
+		yql_url = baseurl + urlencode({'q': yql_query}) + "&format=json"
+		result = urlopen(yql_url).read()
+		data = json.loads(result)
+		res = makeWebhookResult(data)
 	elif req.get("result").get("action") == "getAtomicNumber":
 		data = req
 		res = makeWebhookResultForGetAtomicNumber(data)
@@ -101,21 +99,12 @@ def makeWebhookResultForGetAtomicNumber(data):
 def makeYqlQuery(req):
 	result = req.get("result")
 	parameters = result.get("parameters")
-	location = parameters.get("location")
-	if location is None:
-		return {
-			"speech": "location should be present in parameters",
-			"source": "apiai-resto-webhook"
-		}
-	radius = "2000"
-	apiKey = "AIzaSyCZ8V7Jb7KwHGXMwNRb27U3Lf_nk5Wpc0c"
-	forType = "restaurant"
-	url = "location=" + location
-	url = url + "&radius=" + radius
-	url = url + "&type=" + forType
-	url = url + "&key=" + apiKey
-	url = url + "&keywork=food"
-	return url
+	city = parameters.get("geo-city")
+	if city is None:
+		return None
+
+	return "select * from weather.forecast where woeid in (select woeid from geo.places(1) where text='" + city + "')"
+	
 	
 def makeWebhookResult(data):
 	query = data.get('query')
@@ -141,16 +130,17 @@ def makeWebhookResult(data):
 			return {}
 
 		# print(json.dumps(item, indent=4))
-		
-		
-		speech = "We found few restaurant near by you"
+
+		speech = "Today in " + location.get('city') + ": " + condition.get('text') + \
+				", the temperature is " + condition.get('temp') + " " + units.get('temperature')
+
 		print("Response:")
 		print(speech)
 
 		return {
 			"speech": speech,
 			"displayText": speech,
-			"data": result,
+			# "data": data,
 			# "contextOut": [],
 			"source": "apiai-weather-webhook-sample"
 		}
