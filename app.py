@@ -47,7 +47,7 @@ def processRequest(req):
 		result = urlopen(yql_url).read()
 		data = json.loads(result)
 		res = makeWebhookResult(data)
-	elif req.get("result").get("action") == ""getAtomicNumber":
+	elif req.get("result").get("action") == "getAtomicNumber":
 		data = req
 		res = makeWebhookResultForGetAtomicNumber(data)
 	elif req.get("result").get("action") == "getChemicalSymbol":
