@@ -50,32 +50,11 @@ def processRequest(req):
 	elif req.get("result").get("action") == "getAtomicNumber":
 		data = req
 		res = makeWebhookResultForGetAtomicNumber(data)
-	elif req.get("result").get("action") == "getChemicalSymbol":
-		data = req
-		res = makeWebhookResultForGetChemicalSymbol(data)
 	else:
 		return {}
 	return res
 	
-def makeWebhookResultForGetChemicalSymbol(data):
-	element = data.get("result").get("parameters").get("elementname")
-	chemicalSymbol = 'Unknown'
-	if element == 'Carbon':
-		chemicalSymbol = 'C'
-	elif element == 'Hydrogen':
-		chemicalSymbol = 'H'
-	elif element == 'Nitrogen':
-		chemicalSymbol = 'N'
-	elif element == 'Oxygen':
-		chemicalSymbol = 'O'
-	speech = 'The Chemical symbol of '+element+' is '+chemicalSymbol
-	
-	return {
-		"speech": speech,
-		"displayText": speech,
-		"source": "webhookdata"
-	}
-	
+
 def makeWebhookResultForGetAtomicNumber(data):
 	element = data.get("result").get("parameters").get("elementname")
 	atomicNumber = 'Unknown'
