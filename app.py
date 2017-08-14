@@ -141,17 +141,16 @@ def makeWebhookResult(data):
 			return {}
 
 		# print(json.dumps(item, indent=4))
-
-		speech = "Today in " + location.get('city') + ": " + condition.get('text') + \
-				", the temperature is " + condition.get('temp') + " " + units.get('temperature')
-
+		
+		
+		speech = "We found few restaurant near by you"
 		print("Response:")
 		print(speech)
 
 		return {
 			"speech": speech,
 			"displayText": speech,
-			# "data": data,
+			"data": result,
 			# "contextOut": [],
 			"source": "apiai-weather-webhook-sample"
 		}
